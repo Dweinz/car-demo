@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Car demo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>html,body,#map{height:100%;margin:0}</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([59.3293, 18.0686], 13); // Stockholm
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Simulated cars: random walk with a slowly drifting heading.
+const cars = Array.from({length: 15}, (_, i) => ({
+  lat: 59.3293 + (Math.random() - .5) * .04,
+  lng: 18.0686 + (Math.random() - .5) * .08,
+  heading: Math.random() * 2 * Math.PI,
+  marker: null,
+  id: i + 1,
+}));
+cars.forEach(c => c.marker = L.circleMarker([c.lat, c.lng], {radius: 7, color: '#c00', fillOpacity: .8})
+  .bindTooltip('Car ' + c.id).addTo(map));
+
+setInterval(() => {
+  for (const c of cars) {
+    c.heading += (Math.random() - .5) * .6;
+    c.lat += Math.sin(c.heading) * .0003;
+    c.lng += Math.cos(c.heading) * .0006;
+    c.marker.setLatLng([c.lat, c.lng]);
+  }
+}, 1000);
+</script>
+</body>
+</html>
